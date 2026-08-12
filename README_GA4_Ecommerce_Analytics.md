@@ -31,6 +31,16 @@ A hands-on digital analytics project using the **Google Merchandise Store GA4 pu
 
 ---
 
+# 🚀 End-to-End Analytics Flow
+
+![End-to-End Analytics Flow](docs/end_to_end_analytics_flow.png)
+
+**GA4 nested events → BigQuery → dbt Staging / Intermediate / Mart → Power BI → business insights and activation-ready segments.**
+
+The raw GA4 structure is preserved in BigQuery while business-relevant attributes are promoted into reusable analytical models.
+
+---
+
 # 📊 Power BI Dashboards
 
 > Export the three dashboard pages to `docs/` using the filenames below.
@@ -49,16 +59,6 @@ A hands-on digital analytics project using the **Google Merchandise Store GA4 pu
 ![Product Insights](docs/product_insights.png)
 
 **Product performance | Product segmentation | Activity/recency | Category performance**
-
----
-
-# 🚀 End-to-End Analytics Flow
-
-![End-to-End Analytics Flow](docs/end_to_end_analytics_flow.png)
-
-**GA4 nested events → BigQuery → dbt Staging / Intermediate / Mart → Power BI → business insights and activation-ready segments.**
-
-The raw GA4 structure is preserved in BigQuery while business-relevant attributes are promoted into reusable analytical models.
 
 ---
 
@@ -318,4 +318,4 @@ Product segmentation prioritises **purchase, revenue and recency** because valid
 
 **Google Merchandise Store GA4 public dataset**, accessed through Google BigQuery.
 
-This repository is a portfolio analytics project built for learning and demonstration purposes.
+License: Project code is released under the MIT License. The Google Merchandise Store GA4 sample data remains subject to Google's applicable terms.

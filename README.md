@@ -11,6 +11,7 @@
 <img src="https://img.shields.io/badge/Power_BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black"/>
 </p>
 
+![Project Cover Page](docs/ga4_project_cover.png)
 ---
 
 ## ⭐ Project Highlights

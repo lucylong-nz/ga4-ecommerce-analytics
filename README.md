@@ -43,8 +43,6 @@ The raw GA4 structure is preserved in BigQuery while business-relevant attribute
 
 # 📊 Power BI Dashboards
 
-> Export the three dashboard pages to `docs/` using the filenames below.
-
 ### Executive Overview
 ![Executive Dashboard](docs/executive_dashboard.png)
 

@@ -1,0 +1,64 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: "Event-grain staging model. Creates a stable event key, converts GA4 dates/timestamps, extracts commonly used event parameters, and exposes user, device, geography, acquisition and ecommerce attributes."
+    columns:
+      - name: event_key
+        description: "Surrogate event key generated from user, timestamp, event name and bundle sequence."
+        data_tests: [not_null, unique]
+      - name: event_date
+        description: "Calendar date of the event."
+        data_tests: [not_null]
+      - name: event_timestamp
+        description: "GA4 event timestamp converted to TIMESTAMP."
+        data_tests: [not_null]
+      - name: event_name
+        description: "GA4 event name such as page_view, add_to_cart or purchase."
+        data_tests: [not_null]
+      - name: user_pseudo_id
+        description: "Anonymous browser/device-scoped GA4 user identifier."
+        data_tests: [not_null]
+      - name: ga_session_id
+        description: "GA4 session identifier extracted from event_params."
+        data_tests: [not_null]
+
+  - name: stg_items
+    description: "Item-grain staging model created by unnesting the GA4 items array. Cleans product categories and exposes item-level price, quantity and revenue attributes."
+    columns:
+      - name: event_key
+        description: "Foreign key back to the parent GA4 event."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_events')", field: event_key}
+      - name: event_name
+        description: "Event associated with the item row."
+        data_tests: [not_null]
+      - name: item_id
+        description: "Source product/item identifier."
+        data_tests: [not_null]
+      - name: item_name
+        description: "Source product/item name."
+        data_tests: [not_null]
+      - name: item_category
+        description: "Cleaned source category path with trailing slashes removed."
+      - name: category_level_1
+        description: "First level of the cleaned product category hierarchy."
+
+  - name: stg_event_params
+    description: "Long-form event-parameter model. One row represents one key/value parameter attached to a GA4 event."
+    columns:
+      - name: event_key
+        description: "Foreign key back to the parent GA4 event."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('stg_events')", field: event_key}
+      - name: parameter_key
+        description: "GA4 event parameter name."
+        data_tests: [not_null]
+      - name: parameter_value
+        description: "Parameter value standardised to string for long-form analysis."
+      - name: parameter_type
+        description: "Original GA4 value type used by the parameter."

@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: ga4_raw
+    description: "Google Merchandise Store GA4 public event data loaded into BigQuery. The source is event-grain and contains nested/repeated fields such as event_params and items."
+    database: linen-jet-504701-k8
+    schema: analytics_raw
+    tables:
+      - name: ga4_events_raw
+        description: "Raw GA4 events used as the single source for the analytics pipeline. Approximately 4.30M event rows are available in the project dataset."

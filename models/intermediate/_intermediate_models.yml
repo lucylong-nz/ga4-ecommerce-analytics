@@ -1,0 +1,70 @@
+version: 2
+
+models:
+  - name: int_sessions
+    description: "Session-grain model. One row per user_pseudo_id and ga_session_id with session timing, engagement, ecommerce funnel flags, revenue, device, geography and acquisition attributes."
+    columns:
+      - name: session_key
+        description: "Unique session key generated from anonymous user and GA4 session ID."
+        data_tests: [unique, not_null]
+      - name: user_pseudo_id
+        description: "Anonymous GA4 user identifier."
+        data_tests: [not_null]
+      - name: ga_session_id
+        description: "GA4 session identifier."
+        data_tests: [not_null]
+      - name: session_duration_seconds
+        description: "Seconds between the first and last recorded event in the session."
+      - name: revenue
+        description: "Purchase revenue attributed to the session, standardised to USD."
+
+  - name: int_users
+    description: "User-grain model. One row per anonymous GA4 user with lifetime, recency, engagement and rolling 30-day metrics used for customer segmentation."
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous GA4 user identifier and model grain."
+        data_tests: [unique, not_null]
+      - name: days_since_last_visit
+        description: "Days between dataset end date and the user's latest session."
+      - name: total_sessions
+        description: "Lifetime number of sessions recorded for the user."
+        data_tests: [not_null]
+      - name: total_purchases
+        description: "Lifetime purchase-event count across the user's sessions."
+      - name: total_revenue
+        description: "Lifetime purchase revenue in USD."
+        data_tests: [not_null]
+      - name: sessions_last_30d
+        description: "Sessions in the latest 30-day analysis window."
+      - name: sessions_previous_30d
+        description: "Sessions in the preceding 30-day analysis window."
+
+  - name: int_products
+    description: "Product-grain model. One row per item_id and item_name with product attributes, commercial activity dates, lifetime metrics and rolling 30-day performance. View and add-to-cart fields are retained for exploratory analysis, but source coverage is incomplete for some products; purchase, units, revenue and recency are the preferred performance signals."
+    columns:
+      - name: item_id
+        description: "Source product/item identifier."
+        data_tests: [not_null]
+      - name: item_name
+        description: "Source product/item name."
+        data_tests: [not_null]
+      - name: last_commercial_activity_date
+        description: "Most recent add_to_cart or purchase date recorded for the product."
+      - name: days_since_last_activity
+        description: "Days since the most recent recorded add_to_cart or purchase activity."
+      - name: product_views
+        description: "Lifetime view_item event count. Retained for reference; coverage is incomplete for some products."
+        data_tests: [not_null]
+      - name: add_to_cart_events
+        description: "Lifetime add_to_cart event count. Retained for reference; coverage is incomplete for some products."
+      - name: purchase_events
+        description: "Lifetime purchase event count associated with the product."
+      - name: units_purchased
+        description: "Lifetime quantity sold on purchase events."
+      - name: product_revenue
+        description: "Lifetime item revenue from purchase events."
+        data_tests: [not_null]
+      - name: purchases_last_30d
+        description: "Purchase events in the latest 30-day analysis window."
+      - name: revenue_last_30d
+        description: "Product revenue in the latest 30-day analysis window."

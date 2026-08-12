@@ -1,0 +1,25 @@
+# dbt
+target/
+dbt_packages/
+logs/
+profiles.yml
+
+# Credentials
+.env
+*.json
+
+# Power BI
+*.pbix
+*.pbit
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

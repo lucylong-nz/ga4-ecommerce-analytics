@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: "Calendar dimension generated from session dates for time-based Power BI analysis."
+    columns:
+      - name: date_day
+        description: "Unique calendar date."
+        data_tests: [unique, not_null]
+
+  - name: dim_channel
+    description: "Marketing acquisition dimension that cleans traffic-source labels and groups source/medium combinations into business-friendly channels."
+    columns:
+      - name: channel_key
+        description: "Surrogate key generated from traffic_source and traffic_medium."
+        data_tests: [unique, not_null]
+      - name: channel_group
+        description: "Business-friendly acquisition group such as Direct, Organic Search, Paid Search or Referral."
+
+  - name: fact_sessions
+    description: "Primary Power BI fact table at one row per GA4 session. Contains session KPIs, purchase funnel flags, channel key, device and geography attributes."
+    columns:
+      - name: session_key
+        description: "Unique session identifier."
+        data_tests: [unique, not_null]
+      - name: user_pseudo_id
+        description: "Anonymous GA4 user identifier."
+        data_tests: [not_null]
+      - name: date_key
+        description: "Session date foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('dim_date')", field: date_day}
+      - name: channel_key
+        description: "Marketing channel foreign key."
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('dim_channel')", field: channel_key}
+      - name: revenue
+        description: "Session purchase revenue in USD."
+      - name: purchase
+        description: "Binary flag indicating whether a purchase event occurred in the session."
+
+  - name: mart_customer_segmentation
+    description: "User-level CRM segmentation mart. Segments are mutually exclusive and assigned by priority for customer monitoring and potential marketing activation."
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous GA4 user identifier and model grain."
+        data_tests: [unique, not_null]
+      - name: customer_segment
+        description: "Priority-based segment: High Value - At Risk, High Value, Repeat Customer, At Risk Customer, Declining Customer, New User, Customer, Active Prospect or Inactive Prospect."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['High Value - At Risk','High Value','Repeat Customer','At Risk Customer','Declining Customer','New User','Customer','Active Prospect','Inactive Prospect']
+      - name: is_high_value
+        description: "1 when lifetime revenue is at least USD 176."
+      - name: is_at_risk
+        description: "1 when inactive for at least 30 days and lifetime sessions are at least 2."
+      - name: is_repeat_customer
+        description: "1 when lifetime purchases are at least 2."
+      - name: is_declining
+        description: "1 when previous-30-day sessions are positive and latest-30-day sessions are below 50% of the previous period."
+      - name: is_new_user
+        description: "1 when first touch is within 7 days of dataset end; null when first-touch timestamp is unavailable."
+      - name: total_sessions
+        description: "Lifetime sessions for the user."
+        data_tests: [not_null]
+      - name: total_revenue
+        description: "Lifetime user revenue in USD."
+        data_tests: [not_null]
+
+  - name: mart_product_segmentation
+    description: "Product-level segmentation mart for commercial performance and recency monitoring. Segmentation prioritises purchase, revenue and recency because view_item and add_to_cart coverage is incomplete for some source products."
+    columns:
+      - name: product_key
+        description: "Unique surrogate product key generated from item_id and item_name."
+        data_tests: [not_null, unique]
+      - name: product_segment
+        description: "Mutually exclusive commercial segment. At Risk is prioritised first, followed by High Performer, Revenue Driver and Standard Product."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['At Risk','High Performer','Revenue Driver','Standard Product']
+      - name: activity_status
+        description: "Commercial recency bucket based on days since last add_to_cart or purchase: ≤7d, 8–14d, 15–29d, ≥30d or No Activity."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['≤7d','8–14d','15–29d','≥30d','No Activity']
+      - name: item_id
+        description: "Source product/item identifier."
+        data_tests: [not_null]
+      - name: product_revenue
+        description: "Lifetime item revenue from purchase events."
+        data_tests: [not_null]
+      - name: is_high_performer
+        description: "1 when recent purchases and recent revenue both meet their top-20%-of-positive-products thresholds."
+      - name: is_high_revenue
+        description: "1 when recent revenue meets the high-revenue threshold."
+      - name: is_at_risk
+        description: "1 when days since last recorded commercial activity are at least 30."
